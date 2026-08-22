@@ -99,7 +99,14 @@ export default function Home() {
   }, [])
 
   const monitorEvents = useCallback(async (addr) => {
-    const provider = new ethers.JsonRpcProvider("https://eth.llamarpc.com")
+    let provider
+    try {
+      provider = new ethers.JsonRpcProvider("https://eth.llamarpc.com")
+      // Test connection
+      await provider.getBlockNumber()
+    } catch (e) {
+      throw new Error(`RPC connection failed: ${e?.message || e}`)
+    }
     let lb = getStoredLastBlock(addr) || (await provider.getBlockNumber())
     setLastBlock(lb)
 
@@ -155,13 +162,19 @@ export default function Home() {
       setTimeout(() => setError(null), 3000)
       return
     }
+    if (!/^0x[a-fA-F0-9]{40}$/.test(address)) {
+      setError("Invalid address format")
+      setTimeout(() => setError(null), 3000)
+      return
+    }
     setError(null)
     setIsMonitoring(true)
     setEvents([])
     try {
       await monitorEvents(address)
     } catch (e) {
-      setError("Monitoring failed. Check address and try again.")
+      console.error("Start error:", e)
+      setError(`Error: ${e?.message || e}`)
     }
     setIsMonitoring(false)
   }
