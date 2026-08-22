@@ -29,14 +29,14 @@ const getStoredLastBlock = (address) => {
   }
 }
 
-const setStoredLastBlock = (address: string, block: number) => {
+const setStoredLastBlock = (address, block) => {
   if (typeof window === "undefined") return
   try {
     localStorage.setItem(`${STORAGE_KEY}-${address.toLowerCase()}`, block.toString())
   } catch {}
 }
 
-const getSeenLogs = (): Set<string> => {
+const getSeenLogs = () => {
   if (typeof window === "undefined") return new Set()
   try {
     const data = localStorage.getItem(DEDUP_KEY)
@@ -46,7 +46,7 @@ const getSeenLogs = (): Set<string> => {
   }
 }
 
-const addSeenLog = (seen: Set<string>, key: string) => {
+const addSeenLog = (seen, key) => {
   seen.add(key)
   if (typeof window !== "undefined") {
     try {
@@ -98,7 +98,7 @@ export default function Home() {
     seenLogsRef.current = getSeenLogs()
   }, [])
 
-  const monitorEvents = useCallback(async (addr: string) => {
+  const monitorEvents = useCallback(async (addr) => {
     const provider = new ethers.JsonRpcProvider("https://eth.llamarpc.com")
     let lb = getStoredLastBlock(addr) || (await provider.getBlockNumber())
     setLastBlock(lb)
