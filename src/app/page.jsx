@@ -98,12 +98,30 @@ export default function Home() {
     seenLogsRef.current = getSeenLogs()
   }, [])
 
+  const RPC_ENDPOINTS = [
+    "https://eth.llamarpc.com",
+    "https://ethereum.publicnode.com",
+    "https://rpc.ankr.com/eth",
+    "https://cloudflare-eth.com",
+  ]
+
   const monitorEvents = useCallback(async (addr) => {
     let provider
+    let rpcIndex = 0
+    const tryNextRpc = async () => {
+      for (let i = 0; i < RPC_ENDPOINTS.length; i++) {
+        try {
+          const p = new ethers.JsonRpcProvider(RPC_ENDPOINTS[i])
+          await p.getBlockNumber()
+          return p
+        } catch (e) {
+          console.warn(`RPC ${RPC_ENDPOINTS[i]} failed:`, e?.message)
+        }
+      }
+      throw new Error("All RPC endpoints failed")
+    }
     try {
-      provider = new ethers.JsonRpcProvider("https://eth.llamarpc.com")
-      // Test connection
-      await provider.getBlockNumber()
+      provider = await tryNextRpc()
     } catch (e) {
       throw new Error(`RPC connection failed: ${e?.message || e}`)
     }
@@ -114,7 +132,18 @@ export default function Home() {
 
     while (!abortRef.current.signal.aborted) {
       try {
-        const cb = await provider.getBlockNumber()
+        let cb
+        try {
+          cb = await provider.getBlockNumber()
+        } catch (e) {
+          console.warn("RPC failed, switching:", e?.message)
+          try {
+            provider = await tryNextRpc()
+            continue
+          } catch {
+            throw new Error("All RPC endpoints failed during monitoring")
+          }
+        }
         const safeHead = cb - CONFIRMATIONS
         if (safeHead > lb) {
           let fromBlock = lb + 1
