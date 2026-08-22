@@ -88,7 +88,7 @@ const fetchLogsWithRetry = async (provider, filter, retries = 3) => {
 export default function Home() {
   const [events, setEvents] = useState([])
   const [isMonitoring, setIsMonitoring] = useState(false)
-  const [address, setAddress] = useState("0x0000000000000000000000000000000000000000")
+  const [address, setAddress] = useState("")
   const [lastBlock, setLastBlock] = useState(0)
   const [error, setError] = useState(null)
   const seenLogsRef = useRef(new Set())
@@ -178,131 +178,320 @@ export default function Home() {
   }, [isMonitoring, start])
 
   return (
-    <main className="min-h-screen bg-gray-50 p-4 font-system">
-      <div className="max-w-3xl mx-auto">
-        <header className="mb-6 text-center">
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M17 21v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8.5l3 3z"/>
-                <path d="M3 7v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7"/>
-                <path d="M12 3v4m0 12v4"/>
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">Chain Event Monitor</h1>
-              <p className="text-xs text-gray-500">Raw data decoder · RPC subscriptions · No indexer</p>
-            </div>
-          </div>
-        </header>
+    <div style={styles.container}>
+      <header style={styles.header}>
+        <h1 style={styles.title}>Chain Event Monitor</h1>
+        <p style={styles.subtitle}>Real-time ERC-20 Transfer monitoring</p>
+      </header>
 
-        <div className="bg-white rounded-xl p-4 mb-4 border border-gray-200 shadow-sm">
-          <h2 className="text-lg font-medium text-gray-700 mb-3">Contract Address</h2>
-          <div className="relative">
+      <div style={styles.card}>
+        <div style={styles.inputGroup}>
+          <label style={styles.label}>Contract Address</label>
+          <div style={styles.inputWrapper}>
             <input
+              type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="0x..."
-              className="w-full px-4 py-3 rounded-lg bg-white border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none text-sm"
+              style={styles.input}
               disabled={isMonitoring}
-              aria-label="Contract address"
             />
-            {isMonitoring && (
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-red-500 flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                Monitoring
-              </span>
-            )}
+            {isMonitoring && <span style={styles.badge}>LIVE</span>}
           </div>
-          {error && (
-            <p className="mt-2 text-sm text-red-600" role="alert">{error}</p>
-          )}
+          {error && <p style={styles.error}>{error}</p>}
         </div>
 
-        <div className="mb-6">
-          <button
-            onClick={isMonitoring ? stop : start}
-            disabled={!isMonitoring && (!address || address.startsWith("0x0"))}
-            className={`w-full py-3 rounded-lg font-medium transition-all duration-200 ${
-              isMonitoring
-                ? "bg-red-600 text-white hover:bg-red-700"
-                : "bg-indigo-600 text-white hover:bg-indigo-700"
-            } ${!isMonitoring && (!address || address.startsWith("0x0")) ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
-          >
-            <span className="flex items-center justify-center gap-2">
-              {isMonitoring ? (
-                <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
-                  <path d="M12 2a10 10 0 1 1 0 20" strokeLinecap="round" />
-                </svg>
-              ) : (
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              )}
-              {isMonitoring ? "Stop Monitoring" : "Start Monitoring"}
-            </span>
-          </button>
-        </div>
+        <button
+          onClick={isMonitoring ? stop : start}
+          disabled={!isMonitoring && (!address || address.startsWith("0x0"))}
+          style={{
+            ...styles.button,
+            ...(isMonitoring ? styles.buttonStop : styles.buttonStart),
+            ...(!isMonitoring && (!address || address.startsWith("0x0")) ? styles.buttonDisabled : {}),
+          }}
+        >
+          {isMonitoring ? "Stop Monitoring" : "Start Monitoring"}
+        </button>
 
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
-            <h3 className="text-sm font-medium text-gray-700">Events</h3>
+        <div style={styles.stats}>
+          <div style={styles.stat}>
+            <span style={styles.statValue}>{events.length}</span>
+            <span style={styles.statLabel}>Events</span>
           </div>
-          <div className="max-h-80 overflow-y-auto">
-            {isMonitoring && events.length === 0 && (
-              <div className="p-6 text-center text-gray-400">
-                <svg className="w-8 h-8 mx-auto mb-2 text-indigo-400 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <circle cx="9" cy="21" r="1.5" />
-                  <circle cx="20" cy="21" r="1.5" />
-                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.58" />
-                </svg>
-                <p className="text-sm">Waiting for events...</p>
-              </div>
-            )}
-            {events.length > 0 && (
-              <ul className="divide-y divide-gray-100">
-                {events.map((e, i) => (
-                  <li key={i} className="px-4 py-3 hover:bg-gray-50 transition-colors">
-                    <div className="flex items-start gap-3">
-                      <span className="w-8 text-indigo-600 text-sm font-medium flex-shrink-0">
-                        {e.event}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {formatAddress(e.args.from)} → {formatAddress(e.args.to)}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-0.5">
-                          {formatWei(e.args.value)} ETH · Block {e.blockNumber}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="mt-2 text-right text-indigo-600 text-xs font-mono">
-                      {e.txHash.slice(0, 12)}...
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {!isMonitoring && events.length === 0 && (
-              <div className="p-6 text-center text-gray-400">
-                <svg className="w-8 h-8 mx-auto mb-2 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                  <path d="M22 4L12 4a10 10 0 1 0-3.08 1.54" />
-                  <path d="M4.93 4.93L12 12l7.07-7.07" />
-                  <path d="M6 12a4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4 4 4 0 0 1 4 4z" />
-                  <path d="M16 12a4 4 0 0 0-4 4 4 4 0 0 0 4-4 4 4 0 0 0 4 4z" />
-                </svg>
-                <p className="text-sm">Enter a contract address and click Start Monitoring</p>
-              </div>
-            )}
+          <div style={styles.stat}>
+            <span style={styles.statValue}>{lastBlock || "—"}</span>
+            <span style={styles.statLabel}>Last Block</span>
           </div>
         </div>
-
-        <footer className="mt-8 text-center text-xs text-gray-400">
-          <p>Road to Devcon I • Problem 3 · Chain Event Monitor</p>
-        </footer>
       </div>
-    </main>
+
+      <div style={styles.card}>
+        <h2 style={styles.sectionTitle}>Transfer Events</h2>
+        {isMonitoring && events.length === 0 && (
+          <div style={styles.emptyState}>
+            <div style={styles.pulse}></div>
+                <p>Waiting for transfers...</p>
+              </div>
+        )}
+        {events.length > 0 && (
+          <ul style={styles.list}>
+            {events.map((e, i) => (
+              <li key={i} style={styles.listItem}>
+                <div style={styles.eventRow}>
+                  <span style={styles.eventType}>Transfer</span>
+                  <span style={styles.block}>#{e.blockNumber}</span>
+                </div>
+                <div style={styles.addresses}>
+                  <span style={styles.from}>{formatAddress(e.args.from)}</span>
+                  <span style={styles.arrow}>→</span>
+                  <span style={styles.to}>{formatAddress(e.args.to)}</span>
+                </div>
+                <div style={styles.details}>
+                  <span style={styles.value}>{formatWei(e.args.value)} ETH</span>
+                  <span style={styles.txHash}>{e.txHash.slice(0, 10)}...</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+        {!isMonitoring && events.length === 0 && (
+          <div style={styles.emptyState}>
+            <p>Enter a contract address and start monitoring</p>
+          </div>
+        )}
+      </div>
+    </div>
   )
+}
+
+const styles = {
+  container: {
+    minHeight: "100vh",
+    background: "#0f0f0f",
+    color: "#e4e4e7",
+    fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+    padding: "24px",
+    maxWidth: "720px",
+    margin: "0 auto",
+  },
+  header: {
+    textAlign: "center",
+    marginBottom: "32px",
+    paddingTop: "16px",
+  },
+  title: {
+    fontSize: "28px",
+    fontWeight: 700,
+    letterSpacing: "-0.02em",
+    background: "linear-gradient(135deg, #fff 0%, #a1a1aa 100%)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    margin: "0 0 8px 0",
+  },
+  subtitle: {
+    fontSize: "14px",
+    color: "#71717a",
+    margin: 0,
+    fontWeight: 400,
+  },
+  card: {
+    background: "#18181b",
+    border: "1px solid #27272a",
+    borderRadius: "12px",
+    padding: "24px",
+    marginBottom: "16px",
+  },
+  inputGroup: {
+    marginBottom: "16px",
+  },
+  label: {
+    display: "block",
+    fontSize: "12px",
+    fontWeight: 500,
+    color: "#a1a1aa",
+    marginBottom: "8px",
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
+  },
+  inputWrapper: {
+    position: "relative",
+    display: "flex",
+    alignItems: "center",
+  },
+  input: {
+    width: "100%",
+    padding: "14px 16px",
+    background: "#0f0f0f",
+    border: "1px solid #27272a",
+    borderRadius: "8px",
+    color: "#e4e4e7",
+    fontSize: "14px",
+    fontFamily: "inherit",
+    outline: "none",
+    transition: "border-color 0.2s, box-shadow 0.2s",
+    boxSizing: "border-box",
+  },
+  badge: {
+    position: "absolute",
+    right: "12px",
+    background: "#22c55e",
+    color: "#052e16",
+    fontSize: "10px",
+    fontWeight: 700,
+    padding: "2px 8px",
+    borderRadius: "9999px",
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
+    animation: "pulse 1.5s infinite",
+  },
+  error: {
+    marginTop: "8px",
+    fontSize: "13px",
+    color: "#ef4444",
+  },
+  button: {
+    width: "100%",
+    padding: "14px 24px",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: 600,
+    fontFamily: "inherit",
+    border: "none",
+    cursor: "pointer",
+    transition: "all 0.2s",
+    marginBottom: "16px",
+  },
+  buttonStart: {
+    background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
+    color: "#fff",
+    boxShadow: "0 4px 14px rgba(59, 130, 246, 0.3)",
+  },
+  buttonStop: {
+    background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+    color: "#fff",
+    boxShadow: "0 4px 14px rgba(239, 68, 68, 0.3)",
+  },
+  buttonDisabled: {
+    background: "#27272a",
+    color: "#71717a",
+    cursor: "not-allowed",
+    boxShadow: "none",
+  },
+  stats: {
+    display: "flex",
+    gap: "24px",
+    paddingTop: "16px",
+    borderTop: "1px solid #27272a",
+  },
+  stat: {
+    flex: 1,
+    textAlign: "center",
+  },
+  statValue: {
+    display: "block",
+    fontSize: "24px",
+    fontWeight: 700,
+    fontFamily: "inherit",
+    color: "#fff",
+  },
+  statLabel: {
+    display: "block",
+    fontSize: "11px",
+    color: "#71717a",
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
+    marginTop: "4px",
+  },
+  sectionTitle: {
+    fontSize: "14px",
+    fontWeight: 600,
+    color: "#a1a1aa",
+    margin: "0 0 16px 0",
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
+  },
+  emptyState: {
+    textAlign: "center",
+    padding: "48px 16px",
+    color: "#71717a",
+  },
+  pulse: {
+    width: "12px",
+    height: "12px",
+    background: "#3b82f6",
+    borderRadius: "50%",
+    margin: "0 auto 16px",
+    animation: "pulse 1.5s infinite",
+  },
+  list: {
+    listStyle: "none",
+    padding: 0,
+    margin: 0,
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+  },
+  listItem: {
+    background: "#0f0f0f",
+    border: "1px solid #27272a",
+    borderRadius: "8px",
+    padding: "16px",
+    transition: "border-color 0.2s, background 0.2s",
+  },
+  eventRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "8px",
+  },
+  eventType: {
+    fontSize: "11px",
+    fontWeight: 600,
+    color: "#3b82f6",
+    textTransform: "uppercase",
+    letterSpacing: "0.05em",
+  },
+  block: {
+    fontSize: "12px",
+    color: "#71717a",
+    fontFamily: "inherit",
+  },
+  addresses: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    marginBottom: "8px",
+    flexWrap: "wrap",
+  },
+  from: {
+    fontSize: "13px",
+    color: "#e4e4e7",
+    fontFamily: "inherit",
+  },
+  arrow: {
+    color: "#71717a",
+  },
+  to: {
+    fontSize: "13px",
+    color: "#22c55e",
+    fontFamily: "inherit",
+  },
+  details: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingTop: "8px",
+    borderTop: "1px solid #27272a",
+  },
+  value: {
+    fontSize: "13px",
+    fontWeight: 500,
+    color: "#fff",
+    fontFamily: "inherit",
+  },
+  txHash: {
+    fontSize: "11px",
+    color: "#71717a",
+    fontFamily: "inherit",
+  },
 }
