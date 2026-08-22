@@ -178,25 +178,25 @@ export default function Home() {
   }, [isMonitoring, start])
 
   return (
-    <main className="min-h-screen bg-gray-50 p-8 font-system">
+    <main className="min-h-screen bg-gray-50 p-4 font-system">
       <div className="max-w-3xl mx-auto">
-        <header className="mb-8 text-center">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-xl bg-indigo-600 flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <header className="mb-6 text-center">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M17 21v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8.5l3 3z"/>
                 <path d="M3 7v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7"/>
                 <path d="M12 3v4m0 12v4"/>
               </svg>
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Chain Event Monitor</h1>
-              <p className="text-sm text-gray-500">Raw data decoder · RPC subscriptions · No indexer</p>
+              <h1 className="text-xl font-bold text-gray-900">Chain Event Monitor</h1>
+              <p className="text-xs text-gray-500">Raw data decoder · RPC subscriptions · No indexer</p>
             </div>
           </div>
         </header>
 
-        <div className="bg-white rounded-xl p-6 mb-6 border border-gray-200 shadow-sm">
+        <div className="bg-white rounded-xl p-4 mb-4 border border-gray-200 shadow-sm">
           <h2 className="text-lg font-medium text-gray-700 mb-3">Contract Address</h2>
           <div className="relative">
             <input
@@ -251,8 +251,8 @@ export default function Home() {
           </div>
           <div className="max-h-80 overflow-y-auto">
             {isMonitoring && events.length === 0 && (
-              <div className="p-8 text-center text-gray-400">
-                <svg className="w-10 h-10 mx-auto mb-2 text-indigo-400 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <div className="p-6 text-center text-gray-400">
+                <svg className="w-8 h-8 mx-auto mb-2 text-indigo-400 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <circle cx="9" cy="21" r="1.5" />
                   <circle cx="20" cy="21" r="1.5" />
                   <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.58" />
@@ -285,8 +285,8 @@ export default function Home() {
               </ul>
             )}
             {!isMonitoring && events.length === 0 && (
-              <div className="p-8 text-center text-gray-400">
-                <svg className="w-12 h-12 mx-auto mb-2 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <div className="p-6 text-center text-gray-400">
+                <svg className="w-8 h-8 mx-auto mb-2 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                   <path d="M22 4L12 4a10 10 0 1 0-3.08 1.54" />
                   <path d="M4.93 4.93L12 12l7.07-7.07" />
