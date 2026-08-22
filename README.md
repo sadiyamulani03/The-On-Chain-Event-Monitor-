@@ -1,7 +1,7 @@
 # Chain Event Monitor - Road to Devcon I - Problem 3
 
 ## Live Demo
-🌐 **Vercel Deployment:** https://road2devcon-problem3.vercel.app
+🌐 **Netlify Deployment:** https://theonchaineventmonitor.netlify.app
 
 ## Project Description
 Chain Event Monitor - Raw data decoder turning calldata and event logs into human-readable transaction stories via RPC subscriptions/websockets (no third-party indexer).
@@ -12,18 +12,21 @@ Chain Event Monitor - Raw data decoder turning calldata and event logs into huma
 - Server-Sent Events API for live streaming
 - Contract address input and monitoring UI
 - No third-party indexer required
+- Automatic RPC failover (4 public endpoints)
+- Persistent block tracking (localStorage)
+- Duplicate prevention (txHash + logIndex)
 
 ## Tech Stack
 - Next.js 15.3.6
 - React 19.2.8
 - Ethers.js 6.17.0
-- Vercel Serverless Functions
+- Netlify + @netlify/plugin-nextjs
 
 ## Repository
-https://github.com/sadiyamulani03/The-Chain-Event-Monitor
+https://github.com/sadiyamulani03/The-On-Chain-Event-Monitor-
 
 ## Deployment
-Built and deployed on Vercel with:
+Built and deployed on Netlify with:
 - Node.js 24.x
 - Next.js 15.3.6
 - Automatic deployments from GitHub
