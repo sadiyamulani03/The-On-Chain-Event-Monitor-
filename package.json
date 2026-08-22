@@ -1,0 +1,29 @@
+{
+  "name": "road2devcon-problem3",
+  "version": "1.0.0",
+  "description": "Chain Event Monitor",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "keywords": [],
+  "author": "Sadiya Mulani",
+  "license": "ISC",
+  "engines": {
+    "node": "24.x"
+  },
+  "dependencies": {
+    "ethers": "^6.17.0",
+    "next": "15.3.6",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "7.0.2"
+  }
+}
