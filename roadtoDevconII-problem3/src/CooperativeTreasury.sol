@@ -70,15 +70,26 @@ contract CooperativeTreasury {
         Payment storage p = payments[_paymentId];
         require(p.status == PaymentStatus.Active, "Payment not active");
 
+        // If member is not active, they get 0
+        if (!members[sender].active) {
+            emit ShareWithdrawn(sender, _paymentId, 0);
+            return;
+        }
+
+        uint256 memberShare = members[sender].share;
+        uint256 total = totalShares;
+        uint256 payAmt = p.amount;
+
         uint256 shareOfPayment;
-        if (totalShares > 0) {
-            shareOfPayment = p.amount * members[sender].share / totalShares;
+        if (total > 0) {
+            shareOfPayment = payAmt * memberShare / total;
         } else {
             shareOfPayment = 0;
         }
 
         if (shareOfPayment == 0) {
-            // Still mark as having checked
+            emit ShareWithdrawn(sender, _paymentId, 0);
+            return;
         }
 
         (bool success, ) = sender.call{value: shareOfPayment}("");

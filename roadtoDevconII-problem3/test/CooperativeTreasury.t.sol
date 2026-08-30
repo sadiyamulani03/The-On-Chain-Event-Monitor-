@@ -27,6 +27,7 @@ contract CooperativeTreasuryTest is Test {
         treasury.addMember(memberA, SHARE_A);
         treasury.addMember(memberB, SHARE_B);
         treasury.addMember(memberC, SHARE_C);
+        vm.deal(buyer, 100 ether);
     }
 
     // Helper to get member status
@@ -102,8 +103,7 @@ contract CooperativeTreasuryTest is Test {
         vm.prank(buyer);
         treasury.deposit{value: 1 ether}();
 
-        // Remove memberB before withdrawal
-        vm.prank(admin);
+        // Remove memberB before withdrawal (deployer has COOPERATIVE_ROLE)
         treasury.removeMember(memberB);
 
         // MemberB tries to withdraw - should get 0 since inactive
@@ -137,14 +137,17 @@ contract CooperativeTreasuryTest is Test {
         // Withdraw from both
         vm.prank(memberA);
         treasury.withdraw(1);
+        vm.prank(memberA);
         treasury.withdraw(2);
 
         vm.prank(memberB);
         treasury.withdraw(1);
+        vm.prank(memberB);
         treasury.withdraw(2);
 
         vm.prank(memberC);
         treasury.withdraw(1);
+        vm.prank(memberC);
         treasury.withdraw(2);
     }
 }
