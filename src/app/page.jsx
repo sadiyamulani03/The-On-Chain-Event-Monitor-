@@ -18,7 +18,7 @@ export default function BakeryLoyalty() {
   const walletAddress = embeddedWallet?.address || wallets?.[0]?.address || null;
 
   const fetchBalance = useCallback(async () => {
-    if (!authenticated) return;
+    if (authenticated === false) return;
     setLoadingStamps(true);
     setError(null);
     try {
@@ -48,7 +48,7 @@ export default function BakeryLoyalty() {
   useEffect(() => {
     if (authenticated && ready) {
       fetchBalance();
-    } else if (!authenticated) {
+    } else if (authenticated === false) {
       setStamps(null);
     }
   }, [authenticated, ready, fetchBalance]);
